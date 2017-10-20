@@ -16,7 +16,7 @@
   </div>
     <div class="options">
       <div class="reload" @click="reload()"><img src="../assets/reload.svg" width="20px" height="20px"  alt=""/></div>
-      <a class="download" id="download"">احفظ الصورة منا</a>
+      <a class="download" id="download" :disabled="canDownload == false">احفظ الصورة منا</a>
     </div>
     <footer>
       developed by 
@@ -38,6 +38,7 @@
 import smartcrop from 'smartcrop'
 export default {
   mounted: function () {
+    const self = this
     // let canvas = document.getElementById('canvas')
     let ctx = document.getElementById('canvas').getContext('2d')
     ctx.font = '20px Georgia'
@@ -46,8 +47,8 @@ export default {
       link.href = document.getElementById(canvasId).toDataURL()
       link.download = filename
     }
-
     document.getElementById('download').addEventListener('click', function () {
+      if (!self.$data.canDownload) return
       downloadCanvas(this, 'canvas', 'behance.png')
     }, false)
   },
@@ -63,7 +64,11 @@ export default {
       self.$data.showPlus = true
     },
     filesChange: function (e) {
+      if (!e.target.files.length) {
+        return
+      }
       let self = this
+      self.$data.canDownload = false
       let canvas = document.getElementById('canvas')
       let canvas2 = document.getElementById('canvas2')
       let ctx = document.getElementById('canvas').getContext('2d')
@@ -98,6 +103,7 @@ export default {
       var img = new Image()
       img.src = URL.createObjectURL(e.target.files[0])
       img.onload = function () {
+        self.$data.canDownload = true
         smartcrop.crop(img, options, function (result) {
           let crop = result.topCrop
           ctx.drawImage(img, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height)
@@ -122,7 +128,8 @@ export default {
   data () {
     return {
       city: 'Baghdad',
-      showPlus: true
+      showPlus: true,
+      canDownload: false
     }
   },
   watch: {
@@ -314,11 +321,21 @@ html{
     transition: all 0.3s;
   }
 
+  .download[disabled] {
+    border:1px solid #333;
+    background: #eee;
+    color: #ccc;
+  }
+  .download[disabled]:hover  {
+    border:1px solid #333;
+    background: #eee;
+    color: #ccc;
+  }
   .download:hover {
+    cursor: pointer;
     border:1px solid #04AC11;
     background: transparent;
     color: #04AC00;
-    transition: all 0.3s;
   }
 
   .download {
@@ -335,6 +352,7 @@ html{
     width: 180px;
     font-weight: bold;
     text-decoration: none;
+    transition: all 0.3s;
   }
 
 
