@@ -35,6 +35,7 @@
 </div>
 </template>
 <script>
+import {saveAs} from 'file-saver'
 import smartcrop from 'smartcrop'
 export default {
   mounted: function () {
@@ -44,8 +45,8 @@ export default {
     ctx.font = '20px Georgia'
     ctx.fillText('Hello World!', 400, 400)
     function downloadCanvas (link, canvasId, filename) {
-      link.href = document.getElementById(canvasId).toDataURL()
-      link.download = filename
+      const canvas = document.getElementById(canvasId)
+      canvas.toBlob(blob => saveAs(blob, 'Jameel.png'))
     }
     document.getElementById('download').addEventListener('click', function () {
       if (!self.$data.canDownload) return
